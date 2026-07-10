@@ -5,12 +5,14 @@
   "description": "Sends Omi memories to the Yggdrasil Obsidian second brain vault via webhook. Notes land in the inbox and are automatically processed by a local Hermes LLM.",
   "image": "https://raw.githubusercontent.com/SSB-J-REN/omi-yggdrasil/main/icon.png",
   "category": "productivity",
-  "capabilities": ["memories"],
+  "capabilities": [
+    "memories"
+  ],
   "memory_prompt": "",
   "is_paid": false,
   "external_integration": {
     "triggers_on": "memory_creation",
-    "webhook_url": "https://ambiguity-landlord-threaten.ngrok-free.dev/omi/webhook",
+    "webhook_url": "https://interactions-suggestions-rebecca-iii.trycloudflare.com/omi/webhook",
     "setup_instructions_file_path": "README.md",
     "auth_steps": []
   }
