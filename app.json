@@ -3,7 +3,7 @@
   "name": "Yggdrasil Vault",
   "author": "Jaren Parras",
   "description": "Sends Omi memories to the Yggdrasil Obsidian second brain vault via webhook. Notes land in the inbox and are automatically processed by a local Hermes LLM.",
-  "image": "https://raw.githubusercontent.com/SSB-J-REN/omi-yggdrasil/main/icon.png",
+  "image": "https://raw.githubusercontent.com/SSB-J-REN/omi-yggdrasil/master/icon.png",
   "category": "productivity",
   "capabilities": [
     "memories"
