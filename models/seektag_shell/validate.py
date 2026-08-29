@@ -45,7 +45,9 @@ assert gap > 0, "decorations intrude into the cavity!"
 import shoe_case as s
 print("\nShoe-case primitives:")
 ok2 = True
-ok2 &= check(s.box(-1, 1, -5, 5, 0, 4), "rib (box)")
+ok2 &= check(s.box(-1, 1, -5, 5, 0, 4), "divider (box)")
+ok2 &= check(s.partial_revolve([(12, 1), (24, 1), (24, 4), (12, 4)],
+                               -1.0, 1.0, 40), "wall arc (partial rev)")
 lid_prof = [
     (0.0, 0.0), (s.R_LID - s.BEVEL, 0.0), (s.R_LID, s.BEVEL),
     (s.R_LID, s.LID_TH - s.BEVEL), (s.R_LID - s.BEVEL, s.LID_TH), (0.0, s.LID_TH),

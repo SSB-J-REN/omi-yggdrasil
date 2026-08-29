@@ -90,22 +90,23 @@ A two-part case that laces onto a shoe and seals the tracker inside.
 ![assembled](shoe_assembled.png)
 ![tunnels](shoe_tunnels.png)
 
-- `shoe_base.stl` — tracker cup raised on ribs; the two channels between the
-  ribs are **enclosed lace tunnels** (roof = sealed floor, walls = ribs, floor
-  = the shoe). Thread a shoelace end through each tunnel.
+- `shoe_base.stl` — holds the tracker and has **two fully-enclosed lace
+  tunnels** running straight through the lower body (walls above, below, and on
+  both sides; open only at the two edges). Thread a shoelace end through each
+  tunnel like threading a bead.
 - `shoe_lid.stl` — plain low-profile cap that **snaps** onto the base, sealing
   the tracker (floor below + lid above = sealed on both sides).
 
 | | |
 |---|---|
 | Case outer diameter | 48.4 mm |
-| Assembled height | 17.2 mm |
+| Assembled height | 17.0 mm |
 | Cavity | 40.8 mm dia × 8.4 mm deep |
-| Lace tunnels | 2 × ~11.6 mm wide × 4.8 mm high |
+| Lace tunnels | 2 × 10 mm wide × 3.4 mm high (through holes) |
 
 **Printing:** both parts print flat with **no supports**. Print the base
-rib-side down (cavity opening up); the sealed floor only bridges the ~12 mm
-tunnel gaps. Print the lid flat.
+tunnels-vertical / cavity-opening up; the sealed floor (tunnel roof) only
+bridges the 10 mm tunnel width. Print the lid flat.
 
 **Assembly:** drop the tracker into the base, press the lid on until the snap
 bead clicks over its edge. The snap is a light interference fit — FDM results
@@ -116,7 +117,7 @@ before pressing the lid.
 
 **Lacing:** unlace the shoe a couple of crosses, pass each lace end through one
 tunnel (so the case sits flat over the tongue area), then re-lace. Adjust the
-tunnel spacing with `RIB_X` if your lace pitch differs.
+tunnel width/spacing with `TUNNEL_HALF` / `DIVIDER_HALF` if your lace is wider.
 
 Regenerate with `python3 shoe_case.py`. Tracker size, tunnel size, wall
 thicknesses, and snap tolerances are all parameters at the top of that file.
