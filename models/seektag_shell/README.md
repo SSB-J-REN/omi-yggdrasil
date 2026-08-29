@@ -57,6 +57,32 @@ more glyphs to the `_FONT` table in `generate_shell.py` for other letters.
 - `seektag_decorative_shell.stl` — the flower model (ASCII STL).
 - `seektag_<INITIALS>_<size>.stl` — the monogram models.
 - `shoe_case.py` + `shoe_base.stl` / `shoe_lid.stl` — the lace-in shoe case.
+- `build_step.py` + `*.step` — B-rep CAD (STEP) versions of every model.
+
+## STEP / CAD files
+
+Every model is also provided as a **STEP** file (`.step`) — a true parametric
+B-rep solid with exact curved surfaces, editable in Fusion 360, SolidWorks,
+FreeCAD, Onshape, etc. (The `.stl` files are triangle meshes, best for slicing
+and printing; the `.step` files are best for editing in CAD.)
+
+| STEP file | Model |
+|---|---|
+| `seektag_decorative_shell.step` | flower / mandala pendant |
+| `seektag_AMP_40mm.step`, `seektag_AMP_42mm.step` | AMP monogram, both sizes |
+| `seektag_LDP_40mm.step`, `seektag_LDP_42mm.step` | LDP monogram, both sizes |
+| `shoe_base.step`, `shoe_lid.step` | lace-in shoe case |
+
+Each is a single fused solid. The STEP builds use real CAD booleans, so the
+shoe tunnels are genuine cut holes and the monogram uses a real extruded
+typeface (DejaVu Sans Bold).
+
+Regenerate them with [CadQuery](https://cadquery.readthedocs.io):
+
+```bash
+pip install cadquery
+python3 build_step.py
+```
 - `validate.py` — checks each primitive is watertight and that the decorations
   don't intrude into the tracker cavity.
 - `render_preview.py` — dependency-free software renderer for the preview PNGs.
