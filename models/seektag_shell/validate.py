@@ -40,3 +40,15 @@ print("\nALL WATERTIGHT" if ok else "\nSOME PRIMITIVES NOT CLOSED")
 gap = (g.H - g.EMBED) - g.CAVITY_CEIL
 print("\nFront-wall clearance below decorations: %.2f mm (must be > 0)" % gap)
 assert gap > 0, "decorations intrude into the cavity!"
+
+# --- Shoe case primitives --------------------------------------------------
+import shoe_case as s
+print("\nShoe-case primitives:")
+ok2 = True
+ok2 &= check(s.box(-1, 1, -5, 5, 0, 4), "rib (box)")
+lid_prof = [
+    (0.0, 0.0), (s.R_LID - s.BEVEL, 0.0), (s.R_LID, s.BEVEL),
+    (s.R_LID, s.LID_TH - s.BEVEL), (s.R_LID - s.BEVEL, s.LID_TH), (0.0, s.LID_TH),
+]
+ok2 &= check(g.revolve(lid_prof, g.REV_SEGMENTS), "lid (revolve)")
+print("SHOE PRIMITIVES WATERTIGHT" if ok2 else "SHOE PRIMITIVE NOT CLOSED")

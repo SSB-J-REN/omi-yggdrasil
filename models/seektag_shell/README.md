@@ -56,6 +56,7 @@ more glyphs to the `_FONT` table in `generate_shell.py` for other letters.
 - `generate_variants.py` — builds all monogram variants (initials × sizes).
 - `seektag_decorative_shell.stl` — the flower model (ASCII STL).
 - `seektag_<INITIALS>_<size>.stl` — the monogram models.
+- `shoe_case.py` + `shoe_base.stl` / `shoe_lid.stl` — the lace-in shoe case.
 - `validate.py` — checks each primitive is watertight and that the decorations
   don't intrude into the tracker cavity.
 - `render_preview.py` — dependency-free software renderer for the preview PNGs.
@@ -81,6 +82,44 @@ python3 render_preview.py                                # refresh previews
 
 You can also restyle the front: `PETAL_COUNT`, `PETAL_LEN`, `PETAL_RISE`,
 `DOT_COUNT`, `CENTER_BOSS_R`, etc.
+
+## Lace-in shoe case
+
+A two-part case that laces onto a shoe and seals the tracker inside.
+
+![assembled](shoe_assembled.png)
+![tunnels](shoe_tunnels.png)
+
+- `shoe_base.stl` — tracker cup raised on ribs; the two channels between the
+  ribs are **enclosed lace tunnels** (roof = sealed floor, walls = ribs, floor
+  = the shoe). Thread a shoelace end through each tunnel.
+- `shoe_lid.stl` — plain low-profile cap that **snaps** onto the base, sealing
+  the tracker (floor below + lid above = sealed on both sides).
+
+| | |
+|---|---|
+| Case outer diameter | 48.4 mm |
+| Assembled height | 17.2 mm |
+| Cavity | 40.8 mm dia × 8.4 mm deep |
+| Lace tunnels | 2 × ~11.6 mm wide × 4.8 mm high |
+
+**Printing:** both parts print flat with **no supports**. Print the base
+rib-side down (cavity opening up); the sealed floor only bridges the ~12 mm
+tunnel gaps. Print the lid flat.
+
+**Assembly:** drop the tracker into the base, press the lid on until the snap
+bead clicks over its edge. The snap is a light interference fit — FDM results
+vary, so if the lid is too tight or won't seat, raise `CLEARANCE`; if it's
+loose, lower `SNAP` or `CLEARANCE` in `shoe_case.py` and re-run
+`python3 shoe_case.py`. To permanently seal it, add a drop of glue on the shelf
+before pressing the lid.
+
+**Lacing:** unlace the shoe a couple of crosses, pass each lace end through one
+tunnel (so the case sits flat over the tongue area), then re-lace. Adjust the
+tunnel spacing with `RIB_X` if your lace pitch differs.
+
+Regenerate with `python3 shoe_case.py`. Tracker size, tunnel size, wall
+thicknesses, and snap tolerances are all parameters at the top of that file.
 
 ## Printing notes
 
