@@ -44,6 +44,14 @@ FRONT_WALL         = 2.5    # thickness of the decorative front face
 LIP                = 1.2    # how far the lip overhangs the cavity (radial)
 LIP_HEIGHT         = 1.3    # axial thickness of the lip
 
+# --- Front decoration style ------------------------------------------------
+STYLE              = "flower"  # "flower" (mandala) or "monogram" (initials)
+TEXT               = "AMP"     # initials for the monogram style (1-3 letters)
+TEXT_HEIGHT        = 13.0      # cap height of the letters (mm)
+TEXT_STROKE        = 2.4       # stroke thickness of the letters (mm)
+TEXT_RISE          = 2.4       # how far the letters stand off the front face
+TEXT_SPACING       = 0.14      # gap between letters (in glyph-height units)
+
 # --- Decorative front relief (flower / mandala) ----------------------------
 PETAL_COUNT        = 8      # number of flower petals
 PETAL_LEN          = 12.0   # petal length (radial)
@@ -71,13 +79,19 @@ TORUS_MAJOR_SEG    = 56     # segments around the loop
 TORUS_MINOR_SEG    = 20     # segments around the ring stock
 
 # ---------------------------------------------------------------------------
-# Derived dimensions
+# Derived dimensions (read the module globals live, so a driver can override
+# TRACKER_DIA / TEXT / STYLE and rebuild without re-importing).
 # ---------------------------------------------------------------------------
-R_TRACK = TRACKER_DIA / 2.0 + FIT_CLEARANCE          # cavity radius
-R_OUT   = R_TRACK + SIDE_WALL                        # outer shell radius
-R_LIP   = R_TRACK - LIP                              # inner edge of the lip
-H       = FRONT_WALL + TRACKER_THICK + DEPTH_CLEARANCE  # total shell height
-CAVITY_CEIL = H - FRONT_WALL                         # z of the cavity ceiling
+def derived():
+    r_track = TRACKER_DIA / 2.0 + FIT_CLEARANCE          # cavity radius
+    r_out   = r_track + SIDE_WALL                        # outer shell radius
+    r_lip   = r_track - LIP                              # inner edge of the lip
+    h       = FRONT_WALL + TRACKER_THICK + DEPTH_CLEARANCE  # total height
+    ceil    = h - FRONT_WALL                             # z of cavity ceiling
+    return r_track, r_out, r_lip, h, ceil
+
+
+R_TRACK, R_OUT, R_LIP, H, CAVITY_CEIL = derived()
 
 Tri = tuple  # a triangle is (v0, v1, v2), each v a 3-tuple
 
@@ -208,59 +222,152 @@ def torus(center, major_r, minor_r, axis="z",
     return tris
 
 
+def capsule(p0, p1, r, z_bot, z_top, arc=8):
+    """A raised, rounded bar (capsule footprint extruded in z) from a stroke
+    p0->p1 of radius r. Used to draw monogram letters as raised strokes.
+    The footprint is convex, so top/bottom caps are simple fans."""
+    x0, y0 = p0
+    x1, y1 = p1
+    dx, dy = x1 - x0, y1 - y0
+    L = math.hypot(dx, dy)
+    if L < 1e-9:
+        ux, uy = 1.0, 0.0
+        a_u = 0.0
+    else:
+        ux, uy = dx / L, dy / L
+        a_u = math.atan2(uy, ux)
+
+    poly = []
+    # cap around p1: sweep a_u-90deg .. a_u+90deg (the half facing away p0)
+    for i in range(arc + 1):
+        a = a_u - math.pi / 2 + math.pi * i / arc
+        poly.append((x1 + r * math.cos(a), y1 + r * math.sin(a)))
+    # cap around p0: sweep a_u+90deg .. a_u+270deg (facing away p1)
+    for i in range(arc + 1):
+        a = a_u + math.pi / 2 + math.pi * i / arc
+        poly.append((x0 + r * math.cos(a), y0 + r * math.sin(a)))
+
+    n = len(poly)
+    cx = sum(p[0] for p in poly) / n
+    cy = sum(p[1] for p in poly) / n
+    top_c = (cx, cy, z_top)
+    bot_c = (cx, cy, z_bot)
+    tris = []
+    for i in range(n):
+        j = (i + 1) % n
+        ax, ay = poly[i]
+        bx, by = poly[j]
+        top_a = (ax, ay, z_top)
+        top_b = (bx, by, z_top)
+        bot_a = (ax, ay, z_bot)
+        bot_b = (bx, by, z_bot)
+        tris.append((top_c, top_a, top_b))      # top cap (up)
+        tris.append((bot_c, bot_b, bot_a))      # bottom cap (down)
+        add_quad(tris, bot_a, bot_b, top_b, top_a)  # side wall
+    return [t for t in tris if _tri_area(t) > 1e-9]
+
+
+# ---------------------------------------------------------------------------
+# Stroke font: each glyph is a list of polylines in a unit box
+# (x in [0, advance], y in [0, 1], baseline at 0). "advance" is the last item.
+# ---------------------------------------------------------------------------
+_FONT = {
+    "A": ([(0.00, 0.0), (0.35, 1.0)], [(0.70, 0.0), (0.35, 1.0)],
+          [(0.13, 0.42), (0.57, 0.42)], 0.70),
+    "M": ([(0.00, 0.0), (0.00, 1.0), (0.42, 0.32), (0.84, 1.0),
+           (0.84, 0.0)], 0.84),
+    "P": ([(0.00, 0.0), (0.00, 1.0)],
+          [(0.00, 1.0), (0.42, 0.98), (0.60, 0.83), (0.60, 0.68),
+           (0.42, 0.53), (0.00, 0.51)], 0.62),
+    "L": ([(0.00, 1.0), (0.00, 0.0), (0.52, 0.0)], 0.55),
+    "D": ([(0.00, 0.0), (0.00, 1.0)],
+          [(0.00, 1.0), (0.40, 0.96), (0.63, 0.74), (0.68, 0.50),
+           (0.63, 0.26), (0.40, 0.04), (0.00, 0.0)], 0.70),
+}
+
+
+def monogram(text, cx, cy, cap_h, stroke, z_bot, z_top, spacing):
+    """Raised initials centred at (cx, cy) on the front face."""
+    glyphs = [g for g in text.upper() if g in _FONT]
+    if not glyphs:
+        return []
+    advances = [_FONT[g][-1] for g in glyphs]
+    total = sum(advances) + spacing * (len(glyphs) - 1)  # in glyph-h units
+    r = stroke / 2.0
+    tris = []
+    x_cursor = -total / 2.0                      # left edge, glyph units
+    for g, adv in zip(glyphs, advances):
+        gx0 = x_cursor
+        for stroke_poly in _FONT[g][:-1]:
+            pts = [(cx + (gx0 + px) * cap_h, cy + (py - 0.5) * cap_h)
+                   for (px, py) in stroke_poly]
+            for i in range(len(pts) - 1):
+                tris += capsule(pts[i], pts[i + 1], r, z_bot, z_top)
+        x_cursor += adv + spacing
+    return tris
+
+
 # ---------------------------------------------------------------------------
 # Build the model
 # ---------------------------------------------------------------------------
 def build():
     tris = []
 
+    r_track, r_out, r_lip, h, ceil = derived()
+
     # --- Main body: solid of revolution ------------------------------------
-    # Closed (r, z) profile. z = 0 is the open back; z = H is the front face.
+    # Closed (r, z) profile. z = 0 is the open back; z = h is the front face.
     # Order traces the cross-section so the cavity + snap lip are carved out.
     profile = [
-        (0.0,        H),               # front face centre
-        (R_OUT,      H),               # front outer edge
-        (R_OUT,      0.0),             # down the outer wall to the back
-        (R_LIP,      0.0),             # inward across the back rim (lip face)
-        (R_LIP,      LIP_HEIGHT),      # up the inner lip
-        (R_TRACK,    LIP_HEIGHT),      # out to the cavity wall
-        (R_TRACK,    CAVITY_CEIL),     # up the cavity wall
-        (0.0,        CAVITY_CEIL),     # across the cavity ceiling to the axis
+        (0.0,        h),               # front face centre
+        (r_out,      h),               # front outer edge
+        (r_out,      0.0),             # down the outer wall to the back
+        (r_lip,      0.0),             # inward across the back rim (lip face)
+        (r_lip,      LIP_HEIGHT),      # up the inner lip
+        (r_track,    LIP_HEIGHT),      # out to the cavity wall
+        (r_track,    ceil),            # up the cavity wall
+        (0.0,        ceil),            # across the cavity ceiling to the axis
     ]
     tris += revolve(profile, REV_SEGMENTS)
 
-    # Decorations are domes whose flat base sits EMBED below the front face
-    # so they merge cleanly, yet never reach the cavity ceiling behind the
-    # front wall (base_z stays well above CAVITY_CEIL).
-    base_z = H - EMBED
+    # Decorations are raised off the front face but never reach the cavity
+    # ceiling behind the front wall (base_z stays well above `ceil`).
+    base_z = h - EMBED
+    dot_ring_r = min(DOT_RING_R, r_out - 3.0)
 
-    # --- Central dome ------------------------------------------------------
-    tris += dome(0.0, 0.0, base_z, CENTER_BOSS_R, CENTER_BOSS_R,
-                 CENTER_BOSS_RISE + EMBED)
-
-    # --- Flower petals -----------------------------------------------------
-    for i in range(PETAL_COUNT):
-        ang = 2 * math.pi * i / PETAL_COUNT
-        px = PETAL_RING_R * math.cos(ang)
-        py = PETAL_RING_R * math.sin(ang)
-        # long axis points radially outward -> rot_z = ang
-        tris += dome(px, py, base_z,
-                     PETAL_LEN / 2.0, PETAL_WID / 2.0, PETAL_RISE + EMBED,
-                     rot_z=ang)
-
-    # --- Accent dots near the rim ------------------------------------------
-    for i in range(DOT_COUNT):
-        ang = 2 * math.pi * (i + 0.5) / DOT_COUNT
-        dx = DOT_RING_R * math.cos(ang)
-        dy = DOT_RING_R * math.sin(ang)
-        tris += dome(dx, dy, base_z, DOT_R, DOT_R, DOT_RISE + EMBED,
-                     lat=10, lon=16)
+    if STYLE == "monogram":
+        # --- Initials monogram in the centre -------------------------------
+        tris += monogram(TEXT, 0.0, 0.0, TEXT_HEIGHT, TEXT_STROKE,
+                         base_z, h + TEXT_RISE, TEXT_SPACING)
+        # decorative dot-ring border
+        for i in range(DOT_COUNT):
+            ang = 2 * math.pi * (i + 0.5) / DOT_COUNT
+            dx = dot_ring_r * math.cos(ang)
+            dy = dot_ring_r * math.sin(ang)
+            tris += dome(dx, dy, base_z, DOT_R, DOT_R, DOT_RISE + EMBED,
+                         lat=10, lon=16)
+    else:
+        # --- Flower / mandala ----------------------------------------------
+        tris += dome(0.0, 0.0, base_z, CENTER_BOSS_R, CENTER_BOSS_R,
+                     CENTER_BOSS_RISE + EMBED)
+        for i in range(PETAL_COUNT):
+            ang = 2 * math.pi * i / PETAL_COUNT
+            px = PETAL_RING_R * math.cos(ang)
+            py = PETAL_RING_R * math.sin(ang)
+            tris += dome(px, py, base_z, PETAL_LEN / 2.0, PETAL_WID / 2.0,
+                         PETAL_RISE + EMBED, rot_z=ang)
+        for i in range(DOT_COUNT):
+            ang = 2 * math.pi * (i + 0.5) / DOT_COUNT
+            dx = dot_ring_r * math.cos(ang)
+            dy = dot_ring_r * math.sin(ang)
+            tris += dome(dx, dy, base_z, DOT_R, DOT_R, DOT_RISE + EMBED,
+                         lat=10, lon=16)
 
     # --- Keyring loop at the top (12 o'clock, +y) --------------------------
-    loop_cy = R_OUT + LOOP_NECK + LOOP_MAJOR_R - LOOP_MINOR_R
-    loop_cz = H / 2.0
+    loop_cy = r_out + LOOP_NECK + LOOP_MAJOR_R - LOOP_MINOR_R
+    loop_cz = h / 2.0
     # neck: a stubby rounded block bridging the body rim to the loop
-    tris += neck_block(R_OUT - 1.0, loop_cy, loop_cz)
+    tris += neck_block(r_out - 1.0, loop_cy, loop_cz)
     # the ring: hole faces front/back -> hole axis along z
     tris += torus((0.0, loop_cy, loop_cz), LOOP_MAJOR_R, LOOP_MINOR_R, axis="z")
 

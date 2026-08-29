@@ -5,8 +5,40 @@ A decorative snap-in case for a round **SeekTag / AirTag-style tracker**
 snaps into the back; the front shows a raised flower / mandala relief, and a
 keyring loop at the top lets you hang it from keys, a bag, or a zipper.
 
-![front](preview_front.png)
+Two front styles are included: a **flower/mandala** and a **monogram** with
+your initials.
+
+![flower](preview_front.png)
+![AMP](preview_AMP.png)
+![LDP](preview_LDP.png)
 ![cavity](preview_cavity.png)
+
+## Monogram variants (ready to print)
+
+Personalised initials, each in two cavity sizes. All share the dot-ring border
+and keyring loop; only the initials and cavity size differ.
+
+| File | Initials | Case OD | Fits tracker |
+|---|---|---|---|
+| `seektag_AMP_40mm.stl` | AMP | 46 mm | 40 mm dia × 8 mm |
+| `seektag_AMP_42mm.stl` | AMP | 48 mm | 42 mm dia × 8 mm |
+| `seektag_LDP_40mm.stl` | LDP | 46 mm | 40 mm dia × 8 mm |
+| `seektag_LDP_42mm.stl` | LDP | 48 mm | 42 mm dia × 8 mm |
+
+**Which size?** Print a **40 mm** first — that's the usual size for these round
+SeekTags. If the tracker measures larger or seats loosely, use the **42 mm**.
+Fine-tune tension with `FIT_CLEARANCE` (see below) rather than jumping sizes.
+
+Regenerate all four with:
+
+```bash
+python3 generate_variants.py
+```
+
+To change the letters or make new initials, edit `INITIALS` / `SIZES` in
+`generate_variants.py`, or set `TEXT` directly. The built-in stroke font
+currently covers the letters **A D L M P** (the ones these initials need); add
+more glyphs to the `_FONT` table in `generate_shell.py` for other letters.
 
 | | |
 |---|---|
@@ -20,7 +52,10 @@ keyring loop at the top lets you hang it from keys, a bag, or a zipper.
 ## Files
 
 - `generate_shell.py` — parametric generator (pure Python, **no dependencies**).
-- `seektag_decorative_shell.stl` — the ready-to-print model (ASCII STL).
+  Set `STYLE = "flower"` or `"monogram"` and `TEXT = "..."` at the top.
+- `generate_variants.py` — builds all monogram variants (initials × sizes).
+- `seektag_decorative_shell.stl` — the flower model (ASCII STL).
+- `seektag_<INITIALS>_<size>.stl` — the monogram models.
 - `validate.py` — checks each primitive is watertight and that the decorations
   don't intrude into the tracker cavity.
 - `render_preview.py` — dependency-free software renderer for the preview PNGs.

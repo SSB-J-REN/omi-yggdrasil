@@ -30,6 +30,7 @@ prof = [
 ]
 ok &= check(g.revolve(prof, g.REV_SEGMENTS), "body (revolve)")
 ok &= check(g.dome(0, 0, 0, 6, 4, 3, rot_z=0.5), "dome (petal)")
+ok &= check(g.capsule((0, 0), (5, 3), 1.2, 0.0, 2.4), "capsule (letter stroke)")
 ok &= check(g.torus((0, 0, 0), g.LOOP_MAJOR_R, g.LOOP_MINOR_R), "keyring torus")
 ok &= check(g.neck_block(g.R_OUT - 1.0, 30.0, g.H / 2.0), "neck block")
 print("\nALL WATERTIGHT" if ok else "\nSOME PRIMITIVES NOT CLOSED")
