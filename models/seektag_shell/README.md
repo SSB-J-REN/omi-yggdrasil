@@ -125,10 +125,13 @@ A two-part case that laces onto a shoe and seals the tracker inside.
 
 | | |
 |---|---|
-| Case outer diameter | 48.4 mm |
+| Case outer diameter | 40.9 mm |
 | Assembled height | 17.0 mm |
-| Cavity | 40.8 mm dia × 8.4 mm deep |
+| Cavity | 33.3 mm dia × 8.4 mm deep |
 | Lace tunnels | 2 × 10 mm wide × 3.4 mm high (through holes) |
+
+The cavity inside diameter is set by `CAVITY_DIA` in `shoe_case.py` (currently
+33.3 mm). Change it and re-run to refit a different tracker.
 
 **Printing:** both parts print flat with **no supports**. Print the base
 tunnels-vertical / cavity-opening up; the sealed floor (tunnel roof) only

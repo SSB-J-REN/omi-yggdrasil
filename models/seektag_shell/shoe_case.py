@@ -39,9 +39,8 @@ import generate_shell as g  # reuse revolve / write_stl / helpers
 # ---------------------------------------------------------------------------
 # Parameters (mm)
 # ---------------------------------------------------------------------------
-TRACKER_DIA   = 40.0
-TRACKER_THICK = 8.0
-FIT_CLEARANCE = 0.4          # radial gap around the tracker
+CAVITY_DIA    = 33.3         # finished cavity inside diameter (measured nice fit)
+TRACKER_THICK = 8.0          # cavity depth for the tracker
 
 SLAB_TH       = 1.2          # tunnel floor thickness (bottom slab)
 TUNNEL_H      = 3.4          # tunnel height
@@ -60,7 +59,7 @@ DIVIDER_HALF  = 2.0          # half-width of the centre wall between tunnels
 # ---------------------------------------------------------------------------
 # Derived
 # ---------------------------------------------------------------------------
-R_TRACK = TRACKER_DIA / 2.0 + FIT_CLEARANCE        # cavity radius
+R_TRACK = CAVITY_DIA / 2.0                          # cavity radius (ID = 33.3 mm)
 R_BORE  = R_TRACK + LEDGE_W                         # lid-bore radius
 R_OUT   = R_BORE + SIDE_WALL                        # outer shell radius
 R_BEAD  = R_BORE - SNAP                             # snap bead inner radius
