@@ -11,7 +11,7 @@ A kiosk page for an old Android tablet in the common room:
 
 | Kid | Rule (in `config/family.json`) |
 |---|---|
-| Addie | Mon–Fri, **unless** a calendar event title contains `No School`, `School Closed` or `Teacher Workday` |
+| Addy | Mon–Fri, **unless** a calendar event title contains `No School`, `School Closed` or `Teacher Workday` |
 | Logan | Only days with a calendar event whose title contains `Daycare` |
 
 ## Allergy safety
