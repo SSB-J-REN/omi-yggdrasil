@@ -1,7 +1,7 @@
 // Plain ES2017 so older Android WebViews can run it: no optional chaining, no build step.
 "use strict";
 
-var state = { dashboard: null, taskKid: null };
+var state = { dashboard: null, taskKid: null, rewardKid: null, newStarKid: null };
 
 function $(id) { return document.getElementById(id); }
 
@@ -63,6 +63,11 @@ function renderKids(kids) {
   var order = afternoon ? [SECTIONS[1], SECTIONS[2], SECTIONS[0]] : SECTIONS;
   $("kids").innerHTML = kids.map(function (kid) {
     var done = kid.items.filter(function (i) { return i.done; }).length;
+    var starRow = "";
+    for (var s = 0; s < kid.starsPerReward; s++) {
+      var isNew = kid.id === state.newStarKid && s === kid.filled - 1;
+      starRow += '<span class="star-slot' + (s < kid.filled ? " on" : "") + (isNew ? " new" : "") + '">⭐</span>';
+    }
     var pct = kid.items.length ? Math.round((done / kid.items.length) * 100) : 0;
     var sections = order.map(function (sec) {
       var items = kid.items.filter(function (i) { return i.section === sec.key; });
@@ -74,44 +79,102 @@ function renderKids(kids) {
           (item.taskId ? '<span class="item-delete" data-task="' + item.taskId + '">✕</span>' : "") + "</button>";
       }).join("");
     }).join("");
-    return '<div class="kid" style="--kid:' + kid.color + '"><div class="kid-head"><span class="kid-name">' + esc(kid.emoji) + " " + esc(kid.name) +
-      '</span><span class="stars">⭐ ' + kid.weekStars + " this week</span></div>" +
+    return '<div class="kid" style="--kid:' + kid.color + '"><div class="kid-head"><span class="kid-name">' + esc(kid.emoji) + " " + esc(kid.name) + "</span>" +
+      (kid.rewardsReady > 0 ? '<button class="reward-btn" data-reward="' + kid.id + '">🎁 Reward ready!</button>' : "") + "</div>" +
+      '<div class="star-row">' + starRow + '<span class="star-count">' + kid.filled + "/" + kid.starsPerReward + "</span></div>" +
       '<div class="progress"><div style="width:' + pct + '%"></div></div>' +
-      (pct === 100 ? '<div class="all-done">🎉 All done! Amazing job! 🎉</div>' : "") + sections + "</div>";
+      (kid.starToday ? '<div class="all-done">🌟 Gold star earned today! 🌟</div>' : "") + sections + "</div>";
   }).join("");
+  state.newStarKid = null;
 }
 
-function celebrate(emoji) {
+// Small pop + sparkle burst on the tile that was just checked.
+function popItem(kidId, itemId) {
+  var btn = Array.prototype.filter.call(document.querySelectorAll(".item"), function (b) {
+    return b.getAttribute("data-kid") === kidId && b.getAttribute("data-item") === itemId;
+  })[0];
+  btn.classList.add("pop");
+  var box = btn.getBoundingClientRect();
+  var cx = box.left + box.width - 40;
+  var cy = box.top + box.height / 2;
+  for (var i = 0; i < 8; i++) {
+    var angle = (Math.PI * 2 * i) / 8;
+    var s = document.createElement("div");
+    s.className = "spark";
+    s.textContent = i % 2 ? "✨" : "⭐";
+    s.style.left = cx + "px";
+    s.style.top = cy + "px";
+    s.style.setProperty("--dx", Math.cos(angle) * 70 + "px");
+    s.style.setProperty("--dy", Math.sin(angle) * 70 + "px");
+    $("party").appendChild(s);
+    setTimeout(s.remove.bind(s), 900);
+  }
+}
+
+function confetti(pieces, count) {
   var party = $("party");
-  var pieces = [emoji, "🎉", "⭐", "🌈", "✨"];
-  for (var i = 0; i < 30; i++) {
+  for (var i = 0; i < count; i++) {
     var p = document.createElement("div");
     p.className = "confetti";
     p.textContent = pieces[i % pieces.length];
     p.style.left = Math.random() * 100 + "vw";
-    p.style.animationDelay = Math.random() * 0.8 + "s";
+    p.style.animationDelay = Math.random() * 1.2 + "s";
     party.appendChild(p);
+    setTimeout(p.remove.bind(p), 4200);
   }
-  setTimeout(function () { party.innerHTML = ""; }, 3600);
 }
 
+function showOverlay(kind, emoji, title, sub, ms) {
+  var overlay = $("overlay");
+  overlay.className = "overlay " + kind;
+  $("overlayEmoji").textContent = emoji;
+  $("overlayTitle").textContent = title;
+  $("overlaySub").textContent = sub;
+  overlay.hidden = false;
+  clearTimeout(state.overlayTimer);
+  state.overlayTimer = setTimeout(function () { overlay.hidden = true; }, ms);
+}
+
+function celebrateDay(kid) {
+  showOverlay("day", kid.emoji, kid.name + " did it all!", "🌟 Gold star earned!", 4500);
+  confetti([kid.emoji, "🎉", "⭐", "🌈", "✨"], 60);
+}
+
+function celebrateReward(kid) {
+  showOverlay("reward", "🎁", kid.starsPerReward + " gold stars!", kid.name + " earned a reward! Go tell Mom or Dad!", 7000);
+  setTimeout(function () { $("overlayEmoji").textContent = "🏆"; }, 2000);
+  confetti([kid.emoji, "🎁", "🏆", "⭐", "🌟", "🎉", "🌈", "✨"], 120);
+}
+
+$("overlay").addEventListener("click", function () { $("overlay").hidden = true; });
+
 $("kids").addEventListener("click", async function (ev) {
+  var rewardBtn = ev.target.closest("[data-reward]");
+  if (rewardBtn) { openRewardDialog(rewardBtn.getAttribute("data-reward")); return; }
   var del = ev.target.closest(".item-delete");
   var btn = ev.target.closest(".item");
   if (!btn) return;
   try {
     if (del) {
       await api("DELETE", "/api/tasks/" + del.getAttribute("data-task"));
+      await loadDashboard();
     } else {
       var kid = state.dashboard.kids.filter(function (k) { return k.id === btn.getAttribute("data-kid"); })[0];
       var item = kid.items.filter(function (i) { return i.id === btn.getAttribute("data-item"); })[0];
       item.done = !item.done;
-      kid.weekStars += item.done ? 1 : -1;
       renderKids(state.dashboard.kids);
-      if (item.done && kid.items.every(function (i) { return i.done; })) celebrate(kid.emoji);
-      await api("POST", "/api/check", { kidId: kid.id, itemId: item.id, done: item.done });
+      if (item.done) popItem(kid.id, item.id);
+      var result = await api("POST", "/api/check", { kidId: kid.id, itemId: item.id, done: item.done });
+      // Redraw only when a star lands (the overlay covers it), so the pop animation isn't cut short.
+      if (result.newStar) {
+        kid.starToday = true;
+        kid.filled = result.filled;
+        kid.rewardsReady = result.rewardsReady;
+        state.newStarKid = kid.id;
+        renderKids(state.dashboard.kids);
+        if (result.rewardEarned) celebrateReward(kid); else celebrateDay(kid);
+      }
     }
-    await loadDashboard();
   } catch (err) { showError(err); }
 });
 
@@ -178,6 +241,26 @@ $("taskForm").addEventListener("submit", async function (ev) {
   try {
     await api("POST", "/api/tasks", { kidId: state.taskKid, title: $("taskTitle").value, emoji: $("taskEmoji").value });
     $("dialog").hidden = true;
+    await loadDashboard();
+  } catch (err) { showError(err); }
+});
+
+// ---- Reward dialog (parents) ----
+function openRewardDialog(kidId) {
+  var kid = state.dashboard.kids.filter(function (k) { return k.id === kidId; })[0];
+  state.rewardKid = kid.id;
+  $("rewardHeading").textContent = "🎁 " + kid.name + " earned a reward!";
+  $("rewardText").value = "";
+  $("rewardDialog").hidden = false;
+  $("rewardText").focus();
+}
+
+$("cancelReward").addEventListener("click", function () { $("rewardDialog").hidden = true; });
+$("rewardForm").addEventListener("submit", async function (ev) {
+  ev.preventDefault();
+  try {
+    await api("POST", "/api/rewards", { kidId: state.rewardKid, reward: $("rewardText").value });
+    $("rewardDialog").hidden = true;
     await loadDashboard();
   } catch (err) { showError(err); }
 });

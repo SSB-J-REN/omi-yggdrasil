@@ -3,9 +3,16 @@
 A kiosk page for an old Android tablet in the common room:
 
 - **Coming up** — the next 7 days from both parents' Google Calendars, with 🥪 badges on days each kid needs a packed lunch.
-- **Kids' checklists** — big tap-to-check morning/evening routines, weekly star counts, confetti when everything is done. Parents can add one-off tasks ("Feed the dog") for today.
+- **Kids' checklists** — big tap-to-check morning/evening routines with a pop and sparkle burst on every check. Parents can add one-off tasks ("Feed the dog") for today.
 - **Lunches** — Hermes (via Ollama) suggests today's lunch and the *next* lunch day's lunch (the one you prep tonight), with night-before prep steps.
 - **Heads up** — Hermes reads today + tomorrow on the calendar and gives 3–5 practical prep tips.
+
+## Gold stars & rewards
+
+- Finishing **every** item on the day's list (routines + extra tasks) earns a **gold star**, with a full-screen celebration.
+- Stars add up — they don't have to be consecutive days. Once a day's star is earned it stays, even if something is unchecked or a task is added later.
+- Every **7 stars** earns a reward: a bigger 🎁→🏆 celebration, then a wiggling **🎁 Reward ready!** button on the kid's card. When you hand out the reward, tap it, type what they picked, and the star row starts over.
+- Reward history is kept in `data/state.json` under `rewards`.
 
 ## How lunch days are decided
 

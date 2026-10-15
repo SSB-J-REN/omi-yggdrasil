@@ -23,12 +23,6 @@ export function todayKey(): string {
   return dateKey(new Date());
 }
 
-// Monday of the week containing `key`.
-export function weekStart(key: string): string {
-  const offset = (parseKey(key).getDay() + 6) % 7;
-  return addDays(key, -offset);
-}
-
 // Whole years old on `day`, so ages roll over on birthdays without a config change.
 export function ageOn(birthday: string, day: string): number {
   const b = parseKey(birthday);

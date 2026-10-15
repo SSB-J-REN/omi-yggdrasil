@@ -6,6 +6,7 @@
   --line: #efe6da;
   --accent: #ff8a3d;
   --done: #3cb371;
+  --gold: #ffd23f;
   --error-bg: #ffe3e3;
   --error-ink: #a12626;
   --radius: 22px;
@@ -61,7 +62,16 @@ h2 { font-size: 20px; margin: 4px 0 12px; }
 .kid { background: var(--panel); border-radius: var(--radius); padding: 18px; box-shadow: 0 4px 0 var(--line); border-top: 10px solid var(--kid); }
 .kid-head { display: flex; justify-content: space-between; align-items: center; }
 .kid-name { font-size: 26px; font-weight: 800; white-space: nowrap; }
-.stars { font-size: 15px; font-weight: 800; color: var(--accent); white-space: nowrap; margin-left: 8px; }
+.reward-btn {
+  border: 0; border-radius: 999px; padding: 8px 14px; margin-left: 8px; white-space: nowrap;
+  background: var(--gold); color: var(--ink); font-weight: 800; font-size: 15px;
+  animation: wiggle 1.4s ease-in-out infinite;
+}
+.star-row { display: flex; align-items: center; margin-top: 10px; }
+.star-slot { font-size: 26px; margin-right: 3px; filter: grayscale(1); opacity: .25; }
+.star-slot.on { filter: none; opacity: 1; }
+.star-slot.new { animation: star-earn 1.2s ease; }
+.star-count { margin-left: auto; font-weight: 800; color: var(--muted); }
 .progress { height: 14px; background: var(--line); border-radius: 999px; margin: 10px 0 14px; overflow: hidden; }
 .progress > div { height: 100%; background: var(--kid); border-radius: 999px; transition: width .4s; }
 .section-title { font-size: 15px; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; margin: 12px 0 6px; }
@@ -106,9 +116,35 @@ h2 { font-size: 20px; margin: 4px 0 12px; }
 .dialog-actions { display: flex; justify-content: flex-end; }
 .dialog-actions .pill { margin-left: 10px; }
 
-/* Celebration */
+/* Check-off pop + sparkles */
+.item.pop { animation: pop .45s ease; }
+.item.pop .item-check { animation: check-in .5s ease; }
+.spark { position: fixed; font-size: 24px; margin: -12px 0 0 -12px; pointer-events: none; z-index: 20; animation: spark .8s ease-out forwards; }
+@keyframes pop { 40% { transform: scale(1.06); } 100% { transform: scale(1); } }
+@keyframes check-in { 0% { transform: scale(0) rotate(-120deg); } 70% { transform: scale(1.35) rotate(10deg); } 100% { transform: scale(1) rotate(0); } }
+@keyframes spark { from { transform: translate(0, 0) scale(.5); opacity: 1; } to { transform: translate(var(--dx), var(--dy)) scale(1.3); opacity: 0; } }
+
+/* Gold star & reward celebrations */
+@keyframes star-earn { 0% { transform: scale(0) rotate(-180deg); } 60% { transform: scale(1.8) rotate(20deg); } 100% { transform: scale(1) rotate(0); } }
+@keyframes wiggle { 0%, 100% { transform: rotate(0); } 25% { transform: rotate(-6deg); } 75% { transform: rotate(6deg); } }
+.overlay {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 15;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;
+  background: rgba(255, 248, 239, .94); animation: fade-in .3s ease;
+}
+.overlay[hidden] { display: none; }
+.overlay.reward { background: radial-gradient(circle, rgba(255, 210, 63, .95), rgba(255, 138, 61, .95)); }
+.overlay-emoji { font-size: 150px; line-height: 1.1; animation: bounce .9s ease-in-out infinite; }
+.overlay.reward .overlay-emoji { animation: shake .4s ease-in-out 5, bounce .9s ease-in-out 2s infinite; }
+.overlay-title { font-size: 48px; font-weight: 800; margin-top: 12px; }
+.overlay-sub { font-size: 26px; font-weight: 700; margin-top: 8px; padding: 0 16px; }
+@keyframes fade-in { from { opacity: 0; } }
+@keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-30px); } }
+@keyframes shake { 0%, 100% { transform: rotate(0); } 25% { transform: rotate(-15deg) scale(1.1); } 75% { transform: rotate(15deg) scale(1.1); } }
+
+/* Confetti */
 .party { position: fixed; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; overflow: hidden; z-index: 20; }
-.confetti { position: absolute; top: -60px; font-size: 40px; animation: fall 2.6s ease-in forwards; }
+.confetti { position: absolute; top: -60px; font-size: 40px; animation: fall 2.8s ease-in forwards; }
 @keyframes fall { to { transform: translateY(110vh) rotate(540deg); } }
 
 /* Portrait tablets: stack the columns */

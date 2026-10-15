@@ -3,12 +3,13 @@ import express, { type NextFunction, type Request, type Response } from "express
 import { briefingHash, generateBriefing, type DaySummary } from "./briefing.js";
 import { loadEvents, type CalEvent } from "./calendar.js";
 import { loadConfig, type ChecklistItem, type Kid } from "./config.js";
-import { addDays, parseKey, todayKey, weekStart } from "./dates.js";
+import { addDays, parseKey, todayKey } from "./dates.js";
 import { generateLunch } from "./lunch.js";
 import { needsLunch } from "./schedule.js";
 import { Store, type Lunch } from "./store.js";
 
 const DAYS_AHEAD = 7;
+const STARS_PER_REWARD = 7;
 const config = loadConfig(process.env.CONFIG_PATH ?? "/app/config/family.json");
 const store = new Store(process.env.STATE_PATH ?? "/app/data/state.json");
 const app = express();
@@ -58,12 +59,23 @@ function checklist(kid: Kid, today: string) {
   }));
 }
 
-function weekStars(kid: Kid, today: string): number {
-  let stars = 0;
-  for (let d = weekStart(today); d <= today; d = addDays(d, 1)) {
-    stars += Object.values(store.state.checks[d]?.[kid.id] ?? {}).filter(Boolean).length;
-  }
-  return stars;
+// Awards today's gold star the moment every item is done. A star, once earned, is kept for the day.
+// Returns true only when the star is newly earned.
+function awardStar(kid: Kid, today: string): boolean {
+  const days = (store.state.perfectDays[kid.id] ??= []);
+  if (days.includes(today)) return false;
+  const items = checklist(kid, today);
+  if (items.length === 0 || !items.every((i) => i.done)) return false;
+  days.push(today);
+  return true;
+}
+
+function starStatus(kid: Kid) {
+  const stars = (store.state.perfectDays[kid.id] ?? []).length;
+  const rewardsReady = Math.floor(stars / STARS_PER_REWARD) - (store.state.rewards[kid.id] ?? []).length;
+  // A full row stays lit until the reward is handed out.
+  const filled = stars % STARS_PER_REWARD === 0 && rewardsReady > 0 ? STARS_PER_REWARD : stars % STARS_PER_REWARD;
+  return { stars, filled, rewardsReady };
 }
 
 // One generation per (date, kid) at a time, so the tablet and a phone refreshing together don't double-call Ollama.
@@ -103,7 +115,9 @@ app.get("/api/dashboard", async (_req, res) => {
       name: kid.name,
       emoji: kid.emoji,
       color: kid.color,
-      weekStars: weekStars(kid, today),
+      starToday: (store.state.perfectDays[kid.id] ?? []).includes(today),
+      starsPerReward: STARS_PER_REWARD,
+      ...starStatus(kid),
       items: checklist(kid, today),
     })),
   });
@@ -168,6 +182,18 @@ app.post("/api/check", (req, res) => {
   if (!checklist(kid, today).some((i) => i.id === itemId)) throw new Error(`Unknown checklist item: ${itemId}`);
   const day = (store.state.checks[today] ??= {});
   (day[kid.id] ??= {})[itemId] = req.body.done === true;
+  const newStar = awardStar(kid, today);
+  store.save();
+  const status = starStatus(kid);
+  res.json({ newStar, rewardEarned: newStar && status.stars % STARS_PER_REWARD === 0, ...status });
+});
+
+app.post("/api/rewards", (req, res) => {
+  const kid = findKid(req.body.kidId);
+  const reward = String(req.body.reward ?? "").trim();
+  if (!reward) throw new Error("Say what the reward was");
+  if (starStatus(kid).rewardsReady < 1) throw new Error(`${kid.name} has no reward ready yet`);
+  (store.state.rewards[kid.id] ??= []).push({ redeemedOn: todayKey(), reward });
   store.save();
   res.json({ ok: true });
 });
@@ -188,7 +214,8 @@ app.delete("/api/tasks/:id", (req, res) => {
   const tasks = store.state.tasks[today] ?? [];
   const index = tasks.findIndex((t) => t.id === req.params.id);
   if (index === -1) throw new Error(`Unknown task: ${req.params.id}`);
-  tasks.splice(index, 1);
+  const [removed] = tasks.splice(index, 1);
+  awardStar(findKid(removed!.kidId), today);
   store.save();
   res.json({ ok: true });
 });

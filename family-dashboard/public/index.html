@@ -47,6 +47,23 @@
     </form>
   </div>
 
+  <div id="rewardDialog" class="dialog" hidden>
+    <form id="rewardForm" class="dialog-card">
+      <h2 id="rewardHeading">🎁 Reward time!</h2>
+      <input id="rewardText" placeholder="What reward did they pick?" maxlength="60" required>
+      <div class="dialog-actions">
+        <button type="button" id="cancelReward" class="pill ghost">Not yet</button>
+        <button type="submit" class="pill">Reward given 🎉</button>
+      </div>
+    </form>
+  </div>
+
+  <div id="overlay" class="overlay" hidden>
+    <div id="overlayEmoji" class="overlay-emoji"></div>
+    <div id="overlayTitle" class="overlay-title"></div>
+    <div id="overlaySub" class="overlay-sub"></div>
+  </div>
+
   <div id="party" class="party"></div>
   <script src="app.js"></script>
 </body>
