@@ -163,8 +163,8 @@ Fill in:
 |---|---|
 | `DASHBOARD_PORT` | Free port from Step 3 |
 | `TZ` | **Ask the owner.** The template says `America/Chicago`, which is only a placeholder. |
-| `CAL_JAREN_ICS` | **Owner must provide.** Google Calendar on a computer → Settings → his calendar → *Integrate calendar* → **Secret address in iCal format** |
-| `CAL_MOM_ICS` | Same, for his wife's calendar |
+| `CAL_JAREN_ICS` | **Owner must provide.** Google Calendar on a computer → Settings → their own calendar → *Integrate calendar* → **Secret address in iCal format** |
+| `CAL_MOM_ICS` | Same, for the wife's calendar |
 | `OLLAMA_URL` | From Step 2 |
 | `OLLAMA_MODEL` | From Step 2 |
 
@@ -207,7 +207,7 @@ Check:
 - Lunches come back with no peanut or fish, and the response time is acceptable. Note how long the first call took and report it.
 - `docker logs family-dashboard` shows no errors; report any `[lunch] rejected` lines.
 
-### Step 8 — Tablet (owner does this; give him these instructions)
+### Step 8 — Tablet (owner does this; pass these instructions on)
 
 1. Give the server a fixed LAN IP (DHCP reservation in the router).
 2. Install **Fully Kiosk Browser** on the Android tablet.
