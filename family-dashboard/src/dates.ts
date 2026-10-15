@@ -29,6 +29,14 @@ export function weekStart(key: string): string {
   return addDays(key, -offset);
 }
 
+// Whole years old on `day`, so ages roll over on birthdays without a config change.
+export function ageOn(birthday: string, day: string): number {
+  const b = parseKey(birthday);
+  const d = parseKey(day);
+  const hadBirthday = d.getMonth() > b.getMonth() || (d.getMonth() === b.getMonth() && d.getDate() >= b.getDate());
+  return d.getFullYear() - b.getFullYear() - (hadBirthday ? 0 : 1);
+}
+
 export function weekday(key: string): number {
   return parseKey(key).getDay();
 }

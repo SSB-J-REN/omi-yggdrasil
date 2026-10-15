@@ -33,7 +33,7 @@ This is a word filter, not a label reader. Always check packaging for "may conta
    - `CAL_JAREN_ICS` / `CAL_MOM_ICS` — in Google Calendar on a computer: **Settings → (your calendar) → Integrate calendar → Secret address in iCal format**. Do this for both calendars. Treat these links like passwords.
    - `DASHBOARD_PORT` — any free port (default 8088).
 
-3. Edit `config/family.json`: set the kids' real **ages** (they shape the lunch ideas — placeholders are 6 and 3), rename the `"Mom"` calendar, and adjust chores.
+3. Edit `config/family.json`: check the kids' **birthdays** (ages are computed from them and shape the lunch ideas), rename the `"Mom"` calendar, and adjust chores.
 
 4. Check that the container will be able to reach Ollama. Native Ollama on Linux listens only on `127.0.0.1` by default, which Docker containers cannot reach. Check with:
 

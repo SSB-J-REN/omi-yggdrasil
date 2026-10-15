@@ -3,7 +3,7 @@
     {
       "id": "addie",
       "name": "Addie",
-      "age": 6,
+      "birthday": "2021-05-07",
       "emoji": "🦄",
       "color": "#e8559a",
       "lunch": {
@@ -32,7 +32,7 @@
     {
       "id": "logan",
       "name": "Logan",
-      "age": 3,
+      "birthday": "2023-04-13",
       "emoji": "🦖",
       "color": "#2f9e6e",
       "lunch": { "mode": "calendar", "keyword": "Daycare", "place": "daycare" },

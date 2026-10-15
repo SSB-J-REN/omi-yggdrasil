@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 import type { CalEvent } from "./calendar.js";
-import type { Config } from "./config.js";
+import { ageOf, type Config } from "./config.js";
 import { chatJson } from "./ollama.js";
 import type { Tip } from "./store.js";
 
@@ -36,7 +36,7 @@ export function briefingHash(days: DaySummary[]): string {
 }
 
 export async function generateBriefing(config: Config, days: DaySummary[]): Promise<Tip[]> {
-  const kids = config.kids.map((k) => `${k.name} (age ${k.age})`).join(" and ");
+  const kids = config.kids.map((k) => `${k.name} (age ${ageOf(k)})`).join(" and ");
   const system =
     `You are a friendly family assistant for two parents with kids ${kids}. ` +
     `Given the family calendar, give 3 to 5 short, practical heads-ups: things to prep, pack, remember, or leave early for. ` +

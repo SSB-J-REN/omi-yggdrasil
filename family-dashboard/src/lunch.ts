@@ -1,4 +1,4 @@
-import type { Config, Kid } from "./config.js";
+import { ageOf, type Config, type Kid } from "./config.js";
 import { chatJson } from "./ollama.js";
 import type { Lunch } from "./store.js";
 
@@ -35,7 +35,7 @@ function isLunchShape(v: unknown): v is Omit<Lunch, "generatedAt"> {
 
 export async function generateLunch(config: Config, kid: Kid, recent: string[]): Promise<Lunch> {
   const system =
-    `You plan quick, kid-friendly packed lunches for a ${kid.age}-year-old eating at ${kid.lunch.place}. ` +
+    `You plan quick, kid-friendly packed lunches for a ${ageOf(kid)}-year-old eating at ${kid.lunch.place}. ` +
     `STRICT ALLERGY RULES: never include peanuts or any peanut product, and never include finned fish of any kind ` +
     `(including tuna, salmon, anchovy, fish sauce, Caesar dressing, Worcestershire, or imitation crab). ` +
     `${config.lunchNotes} The lunch must be packable the night before and need no reheating. ` +

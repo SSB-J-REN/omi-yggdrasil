@@ -1,4 +1,5 @@
 import { readFileSync } from "node:fs";
+import { ageOn, parseKey, todayKey } from "./dates.js";
 
 export type ChecklistItem = { title: string; emoji: string };
 
@@ -9,7 +10,7 @@ export type LunchRule =
 export type Kid = {
   id: string;
   name: string;
-  age: number;
+  birthday: string; // YYYY-MM-DD
   emoji: string;
   color: string;
   lunch: LunchRule;
@@ -30,6 +31,10 @@ export type Config = {
 type RawCalendar = { name: string; color: string; urlEnv: string };
 type RawConfig = Omit<Config, "calendars" | "ollamaUrl" | "ollamaModel"> & { calendars: RawCalendar[] };
 
+export function ageOf(kid: Kid): number {
+  return ageOn(kid.birthday, todayKey());
+}
+
 function requireEnv(name: string): string {
   const value = process.env[name];
   if (!value) throw new Error(`Missing required environment variable ${name}`);
@@ -41,6 +46,7 @@ export function loadConfig(path: string): Config {
   if (raw.kids.length === 0) throw new Error("family.json must define at least one kid");
   if (raw.bannedIngredients.length === 0) throw new Error("family.json must list bannedIngredients");
   for (const kid of raw.kids) {
+    parseKey(kid.birthday);
     if (kid.lunch.mode !== "weekdays" && kid.lunch.mode !== "calendar") {
       throw new Error(`Kid ${kid.id}: lunch.mode must be "weekdays" or "calendar"`);
     }
