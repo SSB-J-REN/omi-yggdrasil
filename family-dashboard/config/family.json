@@ -1,0 +1,67 @@
+{
+  "kids": [
+    {
+      "id": "addie",
+      "name": "Addie",
+      "age": 6,
+      "emoji": "🦄",
+      "color": "#e8559a",
+      "lunch": {
+        "mode": "weekdays",
+        "weekdays": [1, 2, 3, 4, 5],
+        "skipKeywords": ["No School", "School Closed", "Teacher Workday"],
+        "place": "school"
+      },
+      "routines": {
+        "morning": [
+          { "title": "Brush teeth", "emoji": "🪥" },
+          { "title": "Get dressed", "emoji": "👕" },
+          { "title": "Make bed", "emoji": "🛏️" },
+          { "title": "Eat breakfast", "emoji": "🥣" },
+          { "title": "Pack backpack", "emoji": "🎒" }
+        ],
+        "evening": [
+          { "title": "Clean up toys", "emoji": "🧸" },
+          { "title": "Reading time", "emoji": "📚" },
+          { "title": "Bath time", "emoji": "🛁" },
+          { "title": "Pajamas on", "emoji": "🌙" },
+          { "title": "Brush teeth", "emoji": "🪥" }
+        ]
+      }
+    },
+    {
+      "id": "logan",
+      "name": "Logan",
+      "age": 3,
+      "emoji": "🦖",
+      "color": "#2f9e6e",
+      "lunch": { "mode": "calendar", "keyword": "Daycare", "place": "daycare" },
+      "routines": {
+        "morning": [
+          { "title": "Brush teeth", "emoji": "🪥" },
+          { "title": "Get dressed", "emoji": "👕" },
+          { "title": "Eat breakfast", "emoji": "🥣" }
+        ],
+        "evening": [
+          { "title": "Clean up toys", "emoji": "🧸" },
+          { "title": "Bath time", "emoji": "🛁" },
+          { "title": "Pajamas on", "emoji": "🌙" },
+          { "title": "Brush teeth", "emoji": "🪥" },
+          { "title": "Pick a bedtime book", "emoji": "📖" }
+        ]
+      }
+    }
+  ],
+  "calendars": [
+    { "name": "Jaren", "color": "#3b6fd8", "urlEnv": "CAL_JAREN_ICS" },
+    { "name": "Mom", "color": "#9b4fd1", "urlEnv": "CAL_MOM_ICS" }
+  ],
+  "lunchNotes": "For kids under 5, cut round foods like grapes and cherry tomatoes lengthwise and avoid whole nuts, popcorn and hard candy. Keep prep under 10 minutes using common grocery-store foods.",
+  "bannedIngredients": [
+    "peanut", "pb&j", "pbj", "satay", "nutter butter", "reese", "groundnut", "arachis", "mixed nuts", "trail mix",
+    "fish", "catfish", "swordfish", "monkfish", "salmon", "lox", "tuna", "cod", "tilapia", "trout", "halibut",
+    "sardine", "anchov", "mackerel", "pollock", "haddock", "mahi", "bass", "snapper", "flounder", "sole",
+    "herring", "perch", "pike", "walleye", "grouper", "caesar", "worcestershire", "surimi", "imitation crab",
+    "kamaboko", "furikake", "bonito", "dashi", "nuoc mam"
+  ]
+}

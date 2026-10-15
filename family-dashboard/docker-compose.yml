@@ -1,0 +1,13 @@
+services:
+  family-dashboard:
+    build: .
+    container_name: family-dashboard
+    restart: unless-stopped
+    env_file: .env
+    ports:
+      - "${DASHBOARD_PORT}:8080"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - ./config:/app/config:ro
+      - ./data:/app/data

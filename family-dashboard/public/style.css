@@ -1,0 +1,119 @@
+:root {
+  --bg: #fff8ef;
+  --panel: #ffffff;
+  --ink: #2b2a33;
+  --muted: #8a8696;
+  --line: #efe6da;
+  --accent: #ff8a3d;
+  --done: #3cb371;
+  --error-bg: #ffe3e3;
+  --error-ink: #a12626;
+  --radius: 22px;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: "Nunito", "Segoe UI", Roboto, system-ui, sans-serif;
+  -webkit-user-select: none;
+  user-select: none;
+  overflow-x: hidden;
+}
+button { font: inherit; color: inherit; cursor: pointer; }
+h2 { font-size: 20px; margin: 4px 0 12px; }
+.muted { color: var(--muted); }
+
+.top { display: flex; justify-content: space-between; align-items: center; padding: 14px 24px 6px; }
+.clock { font-size: 52px; font-weight: 800; line-height: 1; }
+.date { font-size: 20px; color: var(--muted); margin-top: 4px; }
+
+.pill {
+  border: 0; border-radius: 999px; padding: 14px 22px;
+  background: var(--accent); color: #fff; font-weight: 700; font-size: 18px;
+}
+.pill.ghost { background: var(--line); color: var(--ink); }
+.pill.small { padding: 8px 14px; font-size: 15px; }
+
+.error { margin: 8px 24px; padding: 12px 16px; border-radius: 14px; background: var(--error-bg); color: var(--error-ink); font-weight: 700; }
+
+.grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr) minmax(0, 1.1fr);
+  grid-gap: 16px;
+  padding: 10px 24px 24px;
+}
+.panel { background: var(--panel); border-radius: var(--radius); padding: 18px; box-shadow: 0 4px 0 var(--line); }
+.side h2 + * { margin-bottom: 18px; }
+
+/* Calendar */
+.day { margin-bottom: 14px; }
+.day-label { font-weight: 800; font-size: 17px; margin-bottom: 6px; }
+.day-badges { margin-bottom: 4px; }
+.badge { display: inline-block; font-size: 13px; font-weight: 700; padding: 3px 10px; border-radius: 999px; color: #fff; margin: 0 4px 4px 0; }
+.event { display: flex; align-items: baseline; padding: 6px 0 6px 10px; border-left: 5px solid var(--muted); margin-bottom: 4px; }
+.event-time { font-size: 14px; color: var(--muted); width: 76px; flex-shrink: 0; }
+.event-title { font-size: 16px; }
+
+/* Kids */
+.kids { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); grid-gap: 16px; align-content: start; }
+.kid { background: var(--panel); border-radius: var(--radius); padding: 18px; box-shadow: 0 4px 0 var(--line); border-top: 10px solid var(--kid); }
+.kid-head { display: flex; justify-content: space-between; align-items: center; }
+.kid-name { font-size: 26px; font-weight: 800; white-space: nowrap; }
+.stars { font-size: 15px; font-weight: 800; color: var(--accent); white-space: nowrap; margin-left: 8px; }
+.progress { height: 14px; background: var(--line); border-radius: 999px; margin: 10px 0 14px; overflow: hidden; }
+.progress > div { height: 100%; background: var(--kid); border-radius: 999px; transition: width .4s; }
+.section-title { font-size: 15px; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; margin: 12px 0 6px; }
+
+.item {
+  display: flex; align-items: center; width: 100%; text-align: left;
+  border: 3px solid var(--line); background: #fff; border-radius: 18px;
+  padding: 12px 14px; margin-bottom: 10px; min-height: 64px;
+  transition: transform .1s, background .2s;
+}
+.item:active { transform: scale(.97); }
+.item-emoji { font-size: 32px; width: 46px; }
+.item-title { flex: 1; font-size: 20px; font-weight: 700; }
+.item-check { width: 36px; height: 36px; border-radius: 50%; border: 3px solid var(--line); display: flex; align-items: center; justify-content: center; font-size: 22px; color: #fff; }
+.item.done { background: #effaf2; border-color: var(--done); }
+.item.done .item-title { text-decoration: line-through; color: var(--muted); }
+.item.done .item-check { background: var(--done); border-color: var(--done); }
+.item-delete { border: 0; background: none; font-size: 20px; color: var(--muted); padding: 0 6px 0 10px; }
+.all-done { text-align: center; font-size: 22px; font-weight: 800; color: var(--done); padding: 8px; }
+
+/* Lunches & tips */
+.lunch { border: 3px solid var(--line); border-left: 8px solid var(--kid); border-radius: 16px; padding: 12px 14px; margin-bottom: 12px; }
+.lunch-for { font-size: 14px; font-weight: 800; color: var(--muted); }
+.lunch-name { font-size: 19px; font-weight: 800; margin: 4px 0; }
+.lunch ul { margin: 4px 0 8px; padding-left: 20px; }
+.lunch-prep { font-size: 14px; background: var(--bg); border-radius: 10px; padding: 8px 10px; margin-bottom: 8px; }
+.lunch-error { color: var(--error-ink); font-weight: 700; font-size: 14px; margin-bottom: 8px; }
+.disclaimer { font-size: 12px; color: var(--muted); }
+.tips { list-style: none; padding: 0; margin: 0; }
+.tips li { display: flex; font-size: 16px; padding: 8px 0; border-bottom: 2px dashed var(--line); }
+.tips li span:first-child { font-size: 22px; width: 36px; flex-shrink: 0; }
+
+/* Add-task dialog */
+.dialog { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(43, 42, 51, .45); display: flex; align-items: center; justify-content: center; z-index: 10; }
+.dialog[hidden] { display: none; }
+.dialog-card { background: var(--panel); border-radius: var(--radius); padding: 24px; width: 92%; max-width: 440px; }
+.dialog-card input { width: 100%; font: inherit; font-size: 20px; padding: 12px 14px; border: 3px solid var(--line); border-radius: 14px; margin-bottom: 12px; }
+.kid-picker { display: flex; margin-bottom: 12px; }
+.kid-picker button { flex: 1; border: 3px solid var(--line); background: #fff; border-radius: 14px; padding: 12px; font-size: 18px; font-weight: 700; margin-right: 8px; }
+.kid-picker button:last-child { margin-right: 0; }
+.kid-picker button.selected { border-color: var(--kid); background: var(--bg); }
+.dialog-actions { display: flex; justify-content: flex-end; }
+.dialog-actions .pill { margin-left: 10px; }
+
+/* Celebration */
+.party { position: fixed; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; overflow: hidden; z-index: 20; }
+.confetti { position: absolute; top: -60px; font-size: 40px; animation: fall 2.6s ease-in forwards; }
+@keyframes fall { to { transform: translateY(110vh) rotate(540deg); } }
+
+/* Portrait tablets: stack the columns */
+@media (max-width: 900px) {
+  .grid { grid-template-columns: minmax(0, 1fr); padding: 10px 16px 16px; }
+  .top { padding: 14px 16px 6px; }
+  .kids { order: -1; }
+}

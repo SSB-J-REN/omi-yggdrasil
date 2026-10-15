@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="mobile-web-app-capable" content="yes">
+  <title>Family Hub</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="top">
+    <div>
+      <div id="clock" class="clock"></div>
+      <div id="date" class="date"></div>
+    </div>
+    <button id="addTaskBtn" class="pill">➕ Add a task</button>
+  </header>
+
+  <div id="error" class="error" hidden></div>
+
+  <main class="grid">
+    <section class="panel">
+      <h2>📅 Coming up</h2>
+      <div id="calendar"></div>
+    </section>
+
+    <section id="kids" class="kids"></section>
+
+    <section class="panel side">
+      <h2>🥪 Lunches</h2>
+      <div id="lunches"><p class="muted">Thinking up lunches…</p></div>
+      <h2>💡 Heads up</h2>
+      <ul id="tips" class="tips"><li class="muted">Reading the calendar…</li></ul>
+    </section>
+  </main>
+
+  <div id="dialog" class="dialog" hidden>
+    <form id="taskForm" class="dialog-card">
+      <h2>New task for today</h2>
+      <div id="kidPicker" class="kid-picker"></div>
+      <input id="taskTitle" placeholder="e.g. Feed the dog" maxlength="60" required>
+      <input id="taskEmoji" placeholder="Emoji (optional)" maxlength="4">
+      <div class="dialog-actions">
+        <button type="button" id="cancelTask" class="pill ghost">Cancel</button>
+        <button type="submit" class="pill">Add</button>
+      </div>
+    </form>
+  </div>
+
+  <div id="party" class="party"></div>
+  <script src="app.js"></script>
+</body>
+</html>
